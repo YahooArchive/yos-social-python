@@ -1,17 +1,17 @@
-Yahoo! Python SDK
-=================
-
- * Yahoo! Query Language
- * Yahoo! Social API
+# Yahoo! Python SDK
 
 Find documentation and support on Yahoo! Developer Network: http://developer.yahoo.com
+
+ * Yahoo! Application Platform - http://developer.yahoo.com/yap/
+ * Yahoo! Social APIs - http://developer.yahoo.com/social/
+ * Yahoo! Query Language - http://developer.yahoo.com/yql/
 
 Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 
 ## License
 
 @copyright: Copyrights for code authored by Yahoo! Inc. is licensed under the following terms:
-@license:   BSD Open Source License
+@license:   MIT Open Source License
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -46,18 +46,17 @@ terms of a separate license:
 
 ## Install
 
-Simply make sure that this app is on your PYTHON PATH.  Maybe I'll add an installer later.
-Once it is in your PYTHON PATH then to use it in your project. The sdk also requires
-the oauth and simplejson modules, easy installed:
+Simply make sure that this app is on your PYTHON PATH. Once it is in your PYTHON PATH
+then to use it in your project. The sdk also requires the oauth and simplejson modules:
 
     easy_install oauth simplejson
+		python setup.py install
 
 
-## Examples in code
+## Examples
 
 Fetching YQL:
--------------
-
+=============
     import yahoo.yql
 
     response = yahoo.yql.YQLQuery().execute('select * from delicious.feeds.popular')
@@ -70,8 +69,7 @@ Fetching YQL:
 
 
 Fetching Social Data:
----------------------
-
+=====================
     import yahoo.application
 
 		# Yahoo! OAuth Credentials - http://developer.yahoo.com/dashboard/
