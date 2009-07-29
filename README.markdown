@@ -1,4 +1,5 @@
-# Yahoo! Python SDK
+Yahoo! Python SDK
+=================
 
 Find documentation and support on Yahoo! Developer Network: http://developer.yahoo.com
 
@@ -8,7 +9,8 @@ Find documentation and support on Yahoo! Developer Network: http://developer.yah
 
 Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 
-## License
+License
+=======
 
 @copyright: Copyrights for code authored by Yahoo! Inc. is licensed under the following terms:
 @license:   MIT Open Source License
@@ -34,7 +36,8 @@ THE SOFTWARE.
 The Yahoo! Social Python SDK code is subject to the MIT license, see the LICENSE file.
 
 
-## Requirements
+Requirements
+============
 
 The following dependencies are bundled with the Yahoo! Python SDK, but are under
 terms of a separate license:
@@ -44,7 +47,8 @@ terms of a separate license:
  * OpenID - http://openidenabled.com/python-openid
 
 
-## Install
+Install
+=======
 
 Simply make sure that this app is on your PYTHON PATH. Once it is in your PYTHON PATH
 then to use it in your project. The sdk also requires the oauth and simplejson modules:
@@ -53,10 +57,10 @@ then to use it in your project. The sdk also requires the oauth and simplejson m
 		python setup.py install
 
 
-## Examples
+Examples
+========
 
-Fetching YQL:
-=============
+## Fetching YQL:
     import yahoo.yql
 
     response = yahoo.yql.YQLQuery().execute('select * from delicious.feeds.popular')
@@ -68,8 +72,7 @@ Fetching YQL:
       print 'YQL response malformed.'
 
 
-Fetching Social Data:
-=====================
+## Fetching Social Data:
     import yahoo.application
 
 		# Yahoo! OAuth Credentials - http://developer.yahoo.com/dashboard/
@@ -98,8 +101,8 @@ Fetching Social Data:
 		print profile
 
 
-
-## Tests
+Tests
+=====
 
 The Yahoo! Python SDK comes with a test suite to validate functionality. The tests also
 show functional examples and results. To run the test suite, simply execute the test suite:
