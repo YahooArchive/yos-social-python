@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Module>
+  <ModulePrefs title="Python Gifts">
+    <Require feature="opensocial-0.8"/>
+    <Require feature="dynamic-height"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+    <!-- ALm6fM0Fi-m3S97aF4Wbq1oVf_sk7qRq9l482c8FdAglGs-HJSDH3JlVh6GlA62xaQefjXwnvkUZG7zlICAbTBx_5jka7ODjuxGwtkZn0hIYY3qhvTbV1_vE8HzUkfukX6NCxXlrOhkveNmAcfaS3UuMl91whquZ7eiPFThsPdPAL-gm2t27pWQEWYNh9p3RoqpHe5PbaeP2 -->
+    <script type="javascript">
+      // Sends a signed makeRequest to a remote server to load the iframe
+      function sendSignedRequest(server) {
+        var params = {};
+        params[gadgets.io.RequestParameters.AUTHORIZATION] =
+            gadgets.io.AuthorizationType.SIGNED;
+        // This is the critical part which forces the use of HMAC.
+        params["OAUTH_SERVICE_NAME"] = "HMAC";
+        params[gadgets.io.RequestParameters.CONTENT_TYPE] =
+            gadgets.io.ContentType.JSON;
+        params[gadgets.io.RequestParameters.METHOD] =
+            gadgets.io.MethodType.POST;
+        gadgets.io.makeRequest(server, displayFrame, params);
+      };
+
+      // Opens the returned iframe
+      function displayFrame(response) {
+        document.getElementById('frame').innerHTML = response.text;
+        gadgets.window.adjustHeight();
+      };
+
+      // Initiates the signed request that creates the iframe
+      function init() {
+        sendSignedRequest('http://yourserver.com/gifts/iframe');
+      }
+
+      gadgets.util.registerOnLoadHandler(init);
+    </script>
+    <div id="frame"></div>
+    ]]>
+  </Content>
+</Module>
+

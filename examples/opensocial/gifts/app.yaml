@@ -1,0 +1,13 @@
+application: gifts-sample
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+
+- url: /public/(.*)
+  static_files: public/\1
+  upload: public/(.*)
+
+- url: .*
+  script: main.py
