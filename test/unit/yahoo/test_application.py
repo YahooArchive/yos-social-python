@@ -59,6 +59,10 @@ class OAuthApplicationTest(unittest.TestCase):
     updates = self.oauthapp.getUpdates()['updates']
     self.assertEquals('Dustin Whittle', updates[0]['profile_nickname'])
 
+  def test_get_geo_places(self):
+    geocode = self.oauthapp.getGeoPlaces('SOMA, San Francisco, California')
+    self.assertEquals('23512042', geocode['place']['woeid'])
+
   def test_yql(self):
     data = self.oauthapp.yql('select * from social.profile where guid=me')
     self.assertEquals('Dustin Whittle', data['query']['results']['profile']['nickname'])

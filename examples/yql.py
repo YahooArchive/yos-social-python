@@ -68,7 +68,7 @@ def main():
   # make public yql call
   response = yahoo.yql.YQLQuery().execute(yql)
   if 'query' in response and 'results' in response['query']:
-        pprint.PrettyPrinter(indent=2).pprint(response['query']['results'])
+    pprint.PrettyPrinter(indent=2).pprint(response['query']['results'])
   elif 'error' in response:
     print 'YQL query failed with error: "%s".' % response['error']['description']
   else:

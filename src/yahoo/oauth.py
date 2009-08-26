@@ -40,6 +40,9 @@ REQUEST_TOKEN_API_URL = 'https://api.login.yahoo.com/oauth/v2/get_request_token'
 AUTHORIZATION_API_URL = 'https://api.login.yahoo.com/oauth/v2/request_auth'
 ACCESS_TOKEN_API_URL  = 'https://api.login.yahoo.com/oauth/v2/get_token'
 
+# http://developer.yahoo.com/oauth/guide/oauth-auth-flow.html
+
+
 class RequestToken(oauthlib.oauth.OAuthToken):
   """
   RequestToken is a data type that represents an end user via a request token.
@@ -79,6 +82,7 @@ class RequestToken(oauthlib.oauth.OAuthToken):
     request_auth_url = params['xoauth_request_auth_url'][0]
     return RequestToken(key, secret, expires_in, request_auth_url)
   from_string = staticmethod(from_string)
+
 
 class AccessToken(oauthlib.oauth.OAuthToken):
   """
@@ -132,6 +136,7 @@ class AccessToken(oauthlib.oauth.OAuthToken):
     return AccessToken(key, secret, expires_in, session_handle, authorization_expires_in, yahoo_guid)
   from_string = staticmethod(from_string)
 
+
 class Client(oauthlib.oauth.OAuthClient):
 
   def __init__(self, server='https://api.login.yahoo.com/.', port=httplib.HTTPS_PORT, request_token_url=REQUEST_TOKEN_API_URL, access_token_url=ACCESS_TOKEN_API_URL, authorization_url=AUTHORIZATION_API_URL):
@@ -171,11 +176,12 @@ class Client(oauthlib.oauth.OAuthClient):
     else:
       connection = httplib.HTTPConnection("%s:80" % urlData.netloc)
 
-#    headers = oauth_request.to_header('yahooapis.com')
-#    headers.update({'Content-Type' :'application/x-www-form-urlencoded'})
-    connection.request(oauth_request.http_method, oauth_request.to_url())
-
-    # http://developer.yahoo.com/oauth/guide/oauth-auth-flow.html
+    if oauth_request.http_method == 'GET':
+      connection.request(oauth_request.http_method, oauth_request.to_url())
+    else:
+      headers = oauth_request.to_header('yahooapis.com')
+      headers.update({'Content-Type' :'application/x-www-form-urlencoded', 'Accept': '*'})
+      connection.request(oauth_request.http_method, oauth_request.to_url(), oauth_request.to_postdata(), headers)
 
     response = connection.getresponse()
 

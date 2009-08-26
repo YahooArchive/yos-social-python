@@ -24,7 +24,7 @@ class YQLTest(unittest.TestCase):
 
   def test_query_invalid(self):
     """
-    Tests the calling of yql public api given a valid query.
+    Tests error handling when calling a yql public api given an invalid query.
     """
     response = self.yql.execute('select * from delicious.feeds.unknown_test')
     self.assertEquals('No definition found for Table delicious.feeds.unknown_test', response['error']['description'])

@@ -57,13 +57,13 @@ class AccessTokenTest(unittest.TestCase):
 
   def test_to_string(self):
     """
-    Tests creating a request token string
+    Tests creating a access token string
     """
     self.assertEquals('xoauth_yahoo_guid=ECPZF7D765KTAXPDKWS7GE7CUU&oauth_token_secret=048d18e1dfebb968f0d0ee54b7377af1b3997b11&oauth_expires_in=3600&oauth_session_handle=ACThYEp256HbrfHBPMCoe00lD1fVW_bfPBLX_mCMqqLnruo43Bj.6HU-&oauth_authorization_expires_in=898640492&oauth_token=A%253DKO6ZjIGGmw3.Ba7UQ64vLHcGEK5IZoB.32NLJqLDyJzGRBXxWs1YoX_u842QTClj5Do9CbM7tMO5yS_B4fH.zyCbVOpXQoY1NZXQEH.UmWFEmjpKZTX0pv2lEbVtwK2Xwf9FqylF2zlU5f5fIoLaOrfr2eDEVUbwtVJjh465Ry5ig7JAcWu.tb2HxV5Ucw7UrlDAub93hdTU.9w9ggtCMz3zF16cG1NfBROZIVXniyaKxYb0yzGV6E4uq_iwFde65pUyc8SfUXvW5U2Vr4V3dvN3HNb2tquPBcrcthb59VGZ2Yf75oBK2lI.NgcdqPl2t3JbaHwDp4xbnw9dzEHkWGZgiBcPpt2EjnBUznYq7JH.b3uX1rxTWZcJkcsOXATekisHPwGQORUTmkH9G3zhvn0vDnwPO1KucrIa8Kx1yhUt2Vd9bjQWnnX.f8H1C3AFPMsCGsNe9A1jv39AhfIW8JBTOWKqSgvvlcBv24MRlH1PdLbti1mqyEhv7CTYGctUhd1hLtjv4Ox8U7V.ma9QdHJ92F4leeS3eKWDWNL2y1Gt4OLYTqg7IKlUBqHouJE5SC802myr6F.AceLMoL8SvCisvWIFw50bSqKozveV3uAOWgwC51oM5h3GwOttBbZJzsoj7eXqoND5Dy4XUOYoQG.B46lZ3CJAlO8rpkpXlQvMLUh7D1kVKHfdeTw_qwBpKkaulkWk.OYRZ0rua0blkLX.zjRZbiI.s538Z0afVsdh2mc3gDJg9HZ213OjS9On7ffYzkEsCU.jRdED5Ag3y.5omZ0_Y2cOeEw-', self.token.to_string())
 
   def test_from_string(self):
     """
-    Tests creating a request token from string
+    Tests creating a access token from string
     """
     token = yahoo.oauth.AccessToken.from_string('xoauth_yahoo_guid=ECPZF7D765KTAXPDKWS7GE7CUU&oauth_token_secret=048d18e1dfebb968f0d0ee54b7377af1b3997b11&oauth_expires_in=3600&oauth_session_handle=ACThYEp256HbrfHBPMCoe00lD1fVW_bfPBLX_mCMqqLnruo43Bj.6HU-&oauth_authorization_expires_in=898640492&oauth_token=A%253DKO6ZjIGGmw3.Ba7UQ64vLHcGEK5IZoB.32NLJqLDyJzGRBXxWs1YoX_u842QTClj5Do9CbM7tMO5yS_B4fH.zyCbVOpXQoY1NZXQEH.UmWFEmjpKZTX0pv2lEbVtwK2Xwf9FqylF2zlU5f5fIoLaOrfr2eDEVUbwtVJjh465Ry5ig7JAcWu.tb2HxV5Ucw7UrlDAub93hdTU.9w9ggtCMz3zF16cG1NfBROZIVXniyaKxYb0yzGV6E4uq_iwFde65pUyc8SfUXvW5U2Vr4V3dvN3HNb2tquPBcrcthb59VGZ2Yf75oBK2lI.NgcdqPl2t3JbaHwDp4xbnw9dzEHkWGZgiBcPpt2EjnBUznYq7JH.b3uX1rxTWZcJkcsOXATekisHPwGQORUTmkH9G3zhvn0vDnwPO1KucrIa8Kx1yhUt2Vd9bjQWnnX.f8H1C3AFPMsCGsNe9A1jv39AhfIW8JBTOWKqSgvvlcBv24MRlH1PdLbti1mqyEhv7CTYGctUhd1hLtjv4Ox8U7V.ma9QdHJ92F4leeS3eKWDWNL2y1Gt4OLYTqg7IKlUBqHouJE5SC802myr6F.AceLMoL8SvCisvWIFw50bSqKozveV3uAOWgwC51oM5h3GwOttBbZJzsoj7eXqoND5Dy4XUOYoQG.B46lZ3CJAlO8rpkpXlQvMLUh7D1kVKHfdeTw_qwBpKkaulkWk.OYRZ0rua0blkLX.zjRZbiI.s538Z0afVsdh2mc3gDJg9HZ213OjS9On7ffYzkEsCU.jRdED5Ag3y.5omZ0_Y2cOeEw-')
     self.assertEquals(self.token.key, token.key)
@@ -80,13 +80,13 @@ class AccessTokenTest(unittest.TestCase):
 class ClientTest(unittest.TestCase):
 
   def setUp(self):
-    self.client = yahoo.oauth.Client()
+    self.client           = yahoo.oauth.Client()
     self.consumer_key     = 'dj0yJmk9WUxPUkhFUWxISWpvJmQ9WVdrOWFYWmhTVzVDTXpBbWNHbzlNVGt4TmpJNU1EazROdy0tJnM9Y29uc3VtZXJzZWNyZXQmeD01Ng--'
     self.consumer_secret  = 'f893cf549be5cb37f83b1414e2ff212df2ea4c18'
     self.application_id   = 'ivaInB30'
     self.callback_url     = 'http://imaginingtheweb.com/'
 
-    self.consumer = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
+    self.consumer                   = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
     self.signature_method_plaintext = oauthlib.oauth.OAuthSignatureMethod_PLAINTEXT()
     self.signature_method_hmac_sha1 = oauthlib.oauth.OAuthSignatureMethod_HMAC_SHA1()
 

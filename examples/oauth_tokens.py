@@ -62,16 +62,10 @@ def main():
   Demonstrates fetching of oauth tokens from yahoo apis
   """
 
-  ck  = ''
-  cks = ''
-  app = ''
-  cb  = ''
-
   ck  = CONSUMER_KEY
   cks = CONSUMER_SECRET
   app = APPLICATION_ID
   cb  = CALLBACK_URL
-  # yql = 'select * from delicious.feeds.popular'
 
   # use command line options if present, otherwise prompt user
   try:
