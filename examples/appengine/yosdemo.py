@@ -119,7 +119,6 @@ class OAuthController(webapp.RequestHandler):
     def get(self):
         session=gmemsess.Session(self)
         if 'access_token' in session:
-
             request_token = session['request_token'] if 'request_token' in session else None
             if not request_token:
                 self.response.out.write("No un-authed token found in session")
@@ -128,9 +127,6 @@ class OAuthController(webapp.RequestHandler):
             if token.key != urllib.unquote( self.request.get('oauth_token', 'no-token') ):
                 self.response.out.write("Something went wrong! Tokens do not match")
                 return
-    #        ms = MySpace(ckeynsecret.CONSUMER_KEY, ckeynsecret.CONSUMER_SECRET)
-    #        access_token = ms.get_access_token(token)
-    #        session['access_token'] = access_token.to_string()
             session.save()
 
             self.redirect('/')
