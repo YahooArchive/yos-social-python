@@ -33,7 +33,7 @@ Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 __author__   = 'Dustin Whittle <dustin@yahoo-inc.com>'
 __version__  = '0.1'
 
-import httplib, urllib, urlparse, cgi, oauthlib.oauth, simplejson
+import time, logging, random, httplib, urllib, urlparse, cgi, oauthlib.oauth, simplejson
 
 from . import oauth
 from . import yql
@@ -46,7 +46,7 @@ class OAuthApplicationException(Exception):
 
 class OAuthApplication(object):
 
-  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None):
+  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None, options = { }):
 
     self.client = oauth.Client()
 
@@ -55,13 +55,15 @@ class OAuthApplication(object):
     self.application_id      = application_id
     self.callback_url        = callback_url
     self.token               = token
+    self.options             = options
 
-    self.consumer = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
+    self.consumer                   = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
     self.signature_method_plaintext = oauthlib.oauth.OAuthSignatureMethod_PLAINTEXT()
     self.signature_method_hmac_sha1 = oauthlib.oauth.OAuthSignatureMethod_HMAC_SHA1()
 
   # oauth standard apis
   def get_request_token(self):
+    # self.options['lang']
     parameters = { 'xoauth_lang_pref': 'en' }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, http_method='GET', http_url=self.client.request_token_url, parameters=parameters)
     request.sign_request(self.signature_method_plaintext, self.consumer, None)
@@ -147,6 +149,44 @@ class OAuthApplication(object):
     except:
       return False
 
+  def getSocialGraph(self, offset=0, limit=10000):
+    access_token = yahoo_oauth.get_access_token(request)
+    params = {
+        'q': 'select * from social.profile (0, 9999) where guid in (select guid from social.connections (0, 9999) where owner_guid=me)',
+        'format': 'json',
+    }
+    response = yahoo_oauth.make_signed_req(YQL_URL, content=params, token=access_token, request=request)
+    body = json.loads(unicode(response.read(), 'utf-8'))['query']['results']['profile']
+    return body
+
+  def insertUpdate(self, descr, title, link):
+    access_token = yahoo_oauth.get_access_token(request)
+    guid = access_token['xoauth_yahoo_guid']
+    source = "APP.JUqAuh5g"
+    suid = random.randrange(0, 101)
+    body = '''
+    { "updates":
+        [
+            {
+                "class": "app",
+                "collectionType": "guid",
+                "description": "%s",
+                "suid": "%s",
+                "link": "%s",
+                "source": "%s",
+                "pubDate": "%s",
+                "title": "%s",
+                "type": "appActivity",
+                "collectionID": "%s"
+            }
+        ]
+    }''' % (descr, suid, link, source, int(time.time()), title, guid)
+    response = yahoo_oauth.make_signed_req("%s/user/%s/updates/%s/%s" % (YOS_URL, guid, source, suid), method='PUT', content=body, token=access_token, request=request)
+    return response.status
+
+  def getGeoPlaces(self, location):
+    return self.yql('select * from geo.places where text="' + location + '"')['query']['results']
+
   def yql(self, query):
     parameters = { 'q': query, 'format': 'json', 'env': yql.DATATABLES_URL }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=yql.OAUTH_API_URL, parameters=parameters)
@@ -155,4 +195,3 @@ class OAuthApplication(object):
       return simplejson.loads(self.client.access_resource(request))
     except:
       return False
-
