@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="X-XRDS-Location" content="xrds.xml">
+<title>Yahoo! Developer Network: Google App Engine + Yahoo! Social Data</title>
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/combo?3.0.0b1/build/cssreset/reset-min.css&3.0.0b1/build/cssfonts/fonts-min.css&3.0.0b1/build/cssgrids/grids-min.css&3.0.0b1/build/cssbase/base-min.css">
+<link rel="stylesheet" type="text/css" href="media/css/common.css">
+</head>
+<body id="ydoc" class="yui-skin-sam">
+
+<div id="profile" class="yui-b">
+  <div class="vcard">
+    <span class="fn n">
+  		<a href="{{profile.profileUrl}}"  title="{{profile.nickname}}'s Profile" ><img src="{{profile.image.imageUrl}}" height="64" width="64" alt="{{profile.nickname}}'s Profile Picture"></a>
+      <span class="given-name">{{profile.givenName}}</span>
+      <span class="family-name">{{profile.familyName}}</span>
+    </span>
+
+  	<div class="adr">
+  		<span class="locality">{{profile.location}}</span>
+  	</div>
+
+  	<em>{{profile.status.message}}</em>
+
+  </div>
+</div>
+
+<div id="updates" class="yui-b">
+  <h1>{{profile.nickname}}'s Updates</h1>
+
+  <div>
+    <form action="/status" method="post">
+      <fieldset>
+        <input type="hidden" name="action" value="postUpdate">
+        <label for="identity">Post an update</label>
+        <input type="text" name="update" id="update"><input type="submit" value="add">
+      </fieldset>
+    </form>
+  </div>
+
+  {% if updates %}
+  <ul>
+    {% for update in updates %}
+    <li><a title="{{update.loc_longForm}}" href="{{update.link}}"><img src="{{update.loc_iconUrl}}" height="16" width="16" alt="{{update.loc_localizedForm}}">{{update.loc_longForm}}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <span>No updates, make some!</span>
+  {% endif %}
+</div>
+
+<div id="socialgraph" class="yui-b">
+  <h1>{{profile.nickname}}'s Social Graph</h1>
+  {% if connections %}
+  <ul>
+    {% for connection in connections %}
+    <li><a href="{{connection.profileUrl}}"  title="{{connection.nickname}}'s Profile" ><img src="{{connection.image.imageUrl}}" height="48" width="48" alt="{{connection.nickname}}'s Profile Picture"></a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <span>No contacts, find some!</span>
+  {% endif %}
+</div>
+
+
+<script type="text/javascript" src="http://yui.yahooapis.com/combo?3.0.0b1/build/yui/yui-min.js"></script>
+</body>
+</html>

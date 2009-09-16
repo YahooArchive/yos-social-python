@@ -1,0 +1,14 @@
+application: yapdemo
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /media
+  static_dir: media
+
+- url: /social/.*
+  script: djangodemo.py
+
+- url: /.*
+  script: yosdemo.py
