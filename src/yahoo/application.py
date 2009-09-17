@@ -162,7 +162,7 @@ class OAuthApplication(object):
   def insertUpdate(self, descr, title, link):
     access_token = yahoo_oauth.get_access_token(request)
     guid = access_token['xoauth_yahoo_guid']
-    source = "APP.JUqAuh5g"
+    source = "APP.%s" % self.application_id
     suid = random.randrange(0, 101)
     body = '''
     { "updates":
