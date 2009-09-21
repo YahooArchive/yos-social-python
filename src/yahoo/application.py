@@ -33,7 +33,7 @@ Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 __author__   = 'Dustin Whittle <dustin@yahoo-inc.com>'
 __version__  = '0.1'
 
-import time, logging, random, httplib, urllib, urlparse, cgi, oauthlib.oauth, simplejson
+import time, random, oauthlib.oauth, simplejson
 
 from . import oauth
 from . import yql
@@ -149,21 +149,12 @@ class OAuthApplication(object):
     except:
       return False
 
-  def getSocialGraph(self, offset=0, limit=10000):
-    access_token = yahoo_oauth.get_access_token(request)
-    params = {
-        'q': 'select * from social.profile (0, 9999) where guid in (select guid from social.connections (0, 9999) where owner_guid=me)',
-        'format': 'json',
-    }
-    response = yahoo_oauth.make_signed_req(YQL_URL, content=params, token=access_token, request=request)
-    body = json.loads(unicode(response.read(), 'utf-8'))['query']['results']['profile']
-    return body
-
-  def insertUpdate(self, descr, title, link):
-    access_token = yahoo_oauth.get_access_token(request)
-    guid = access_token['xoauth_yahoo_guid']
+  def insertUpdate(self, descr, title, link, guid=None):
+    if guid == None:
+      guid = self.token.yahoo_guid
     source = "APP.%s" % self.application_id
     suid = random.randrange(0, 101)
+    parameters = { 'format': 'json' }
     body = '''
     { "updates":
         [
@@ -181,8 +172,18 @@ class OAuthApplication(object):
             }
         ]
     }''' % (descr, suid, link, source, int(time.time()), title, guid)
-    response = yahoo_oauth.make_signed_req("%s/user/%s/updates/%s/%s" % (YOS_URL, guid, source, suid), method='PUT', content=body, token=access_token, request=request)
-    return response.status
+
+    url = "%s/user/%s/updates/%s/%s" % (SOCIAL_API_URL, guid, source, suid)
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+
+    try:
+      return simplejson.loads(self.client.access_resource(request, body))
+    except:
+      return False
+
+  def getSocialGraph(self, offset=0, limit=10000):
+    return self.yql('select * from social.profile (%s, %s) where guid in (select guid from social.connections (%s, %s) where owner_guid=me)' % (offset, limit, offset, limit))['query']['results']['profile']
 
   def getGeoPlaces(self, location):
     return self.yql('select * from geo.places where text="' + location + '"')['query']['results']

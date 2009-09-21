@@ -44,20 +44,28 @@ class OAuthApplicationTest(unittest.TestCase):
 
   def test_get_presence(self):
     presence = self.oauthapp.getPresence()
-    self.assertEquals('I&#39;m on a raft floating down the Amazon.', presence['value']['status'])
+    self.assertEquals('...', presence['value']['status'])
     self.assertEquals('yahoo', presence['src'])
 
   def test_get_connections(self):
     connections = self.oauthapp.getConnections()['connections']
-    self.assertEquals(82, connections['count'])
+    self.assertEquals(81, connections['count'])
 
   def test_get_contacts(self):
     contacts = self.oauthapp.getContacts()['connections']
-    self.assertEquals(82, contacts['count'])
+    self.assertEquals(81, contacts['count'])
 
   def test_get_updates(self):
     updates = self.oauthapp.getUpdates()['updates']
     self.assertEquals('Dustin Whittle', updates[0]['profile_nickname'])
+
+  def test_insert_update(self):
+    update = self.oauthapp.insertUpdate('my test description', 'my test title', 'http://apps.yahoo.com/test')
+    self.assertEquals('Operation was successfull', update['error']['detail'])
+
+  def test_get_social_graph(self):
+    social_graph = self.oauthapp.getSocialGraph(0, 10)
+    self.assertEquals('ChrisHeilmann', social_graph[0]['nickname'])
 
   def test_get_geo_places(self):
     geocode = self.oauthapp.getGeoPlaces('SOMA, San Francisco, California')

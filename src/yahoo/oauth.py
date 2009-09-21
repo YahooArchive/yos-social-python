@@ -33,7 +33,7 @@ Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 __author__   = 'Dustin Whittle <dustin@yahoo-inc.com>'
 __version__  = '0.1'
 
-import httplib, urllib, urlparse, cgi, oauthlib.oauth, simplejson
+import httplib, urllib, urlparse, cgi, oauthlib.oauth
 
 # Yahoo! OAuth APIs
 REQUEST_TOKEN_API_URL = 'https://api.login.yahoo.com/oauth/v2/get_request_token'
@@ -168,8 +168,8 @@ class Client(oauthlib.oauth.OAuthClient):
     response = self.connection.getresponse()
     return response.read()
 
-  def access_resource(self, oauth_request):
-    urlData = urlparse.urlparse(oauth_request.to_url())
+  def access_resource(self, oauth_request, body = None):
+    urlData = urlparse.urlparse(oauth_request.get_normalized_http_url())
 
     if urlData.scheme == 'https':
       connection = httplib.HTTPSConnection("%s:443" % urlData.netloc)
@@ -178,10 +178,10 @@ class Client(oauthlib.oauth.OAuthClient):
 
     if oauth_request.http_method == 'GET':
       connection.request(oauth_request.http_method, oauth_request.to_url())
+    elif oauth_request.http_method in ('PUT', 'POST', 'DELETE'):
+      connection.request(oauth_request.http_method, oauth_request.to_url(), body=body)
     else:
-      headers = oauth_request.to_header('yahooapis.com')
-      headers.update({'Content-Type' :'application/x-www-form-urlencoded', 'Accept': '*'})
-      connection.request(oauth_request.http_method, oauth_request.to_url(), oauth_request.to_postdata(), headers)
+      connection.request(oauth_request.http_method, oauth_request.to_url())
 
     response = connection.getresponse()
 
