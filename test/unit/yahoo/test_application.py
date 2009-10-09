@@ -53,11 +53,15 @@ class OAuthApplicationTest(unittest.TestCase):
 
   def test_get_contacts(self):
     contacts = self.oauthapp.getContacts()['contacts']
-    self.assertEquals(81, contacts['count'])
+    self.assertEquals(10, contacts['count'])
 
   def test_get_contact(self):
 	contact = self.oauthapp.getContact(1)['contact']
 	self.assertEquals(1, contact['id'])
+	
+  def test_get_contact_sync(self):
+	contactsync = self.oauthapp.getContactSync(0)['contactsync']
+	self.assertEquals(0, contactsync['clientrev'])
 
   def test_get_updates(self):
     updates = self.oauthapp.getUpdates()['updates']
@@ -65,7 +69,7 @@ class OAuthApplicationTest(unittest.TestCase):
 
   def test_insert_update(self):
     update = self.oauthapp.insertUpdate('my test description', 'my test title', 'http://apps.yahoo.com/test')
-    self.assertEquals('Operation was successful', update['error']['detail'])
+    self.assertEquals('Operation was successfull', update['error']['detail'])
 
   def test_get_social_graph(self):
     social_graph = self.oauthapp.getSocialGraph(0, 10)
