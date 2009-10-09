@@ -128,8 +128,55 @@ class OAuthApplication(object):
   def getContacts(self, guid=None, offset=0, limit=10000):
     if guid == None:
       guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/connections' % guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
     parameters = { 'format': 'json', 'view': 'tinyusercard', 'start': offset, 'count': limit }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request))
+    except:
+      return False
+
+  def getContact(self, contact_id):
+    guid = self.token.yahoo_guid
+    url = SOCIAL_API_URL + '/user/%s/contact/%s' % (guid, contact_id)
+    parameters = { 'format': 'json' }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request))
+    except:
+      return False
+
+  def addContact(self, contact):
+    guid = self.token.yahoo_guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    parameters = { 'format': 'json' }
+    data = {'contact': contact}
+    body = simplejson.dumps(data);
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='POST', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request, body))
+    except:
+      return False
+
+  def syncContacts(self, contact_sync):
+    guid = self.token.yahoo_guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    parameters = { 'format': 'json' }
+    data = {'contactsync': contact_sync}
+    body = simplejson.dumps(data);
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request, body))
+    except:
+      return False
+
+  def getContactSync(self, rev):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    parameters = { 'format': 'json', 'view': 'sync', 'rev': rev }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
     try:
@@ -153,7 +200,7 @@ class OAuthApplication(object):
     if guid == None:
       guid = self.token.yahoo_guid
     source = "APP.%s" % self.application_id
-    suid = random.randrange(0, 101)
+    suid = 'ugc%s' % random.randrange(0, 101)
     parameters = { 'format': 'json' }
     body = '''
     { "updates":
