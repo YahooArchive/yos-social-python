@@ -125,9 +125,7 @@ class OAuthApplication(object):
     except:
       return False
 
-  def getContacts(self, guid=None, offset=0, limit=10000):
-    if guid == None:
-      guid = self.token.yahoo_guid
+  def getContacts(self, offset=0, limit=10000):
     url = SOCIAL_API_URL + '/user/%s/contacts' % guid
     parameters = { 'format': 'json', 'view': 'tinyusercard', 'start': offset, 'count': limit }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
@@ -174,7 +172,8 @@ class OAuthApplication(object):
     except:
       return False
 
-  def getContactSync(self, rev):
+  def getContactSync(self, rev = 0):
+    guid = self.token.yahoo_guid
     url = SOCIAL_API_URL + '/user/%s/contacts' % guid
     parameters = { 'format': 'json', 'view': 'sync', 'rev': rev }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
