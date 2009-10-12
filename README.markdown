@@ -106,6 +106,8 @@ Examples
     # Fetch request token
     request_token = oauthapp.get_request_token(CALLBACK_URL)
 
+    verifier  = self.request.get('oauth_verifier') # must fetch oauth_verifier from request
+
     # Redirect user to authorization url
     redirect_url  = oauthapp.get_authorization_url(request_token, verifier)
 
