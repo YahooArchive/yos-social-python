@@ -86,7 +86,7 @@ class IndexController(webapp.RequestHandler):
             session.save()
 
             # redirect the user to authorize the request token
-            self.redirect(oauthapp.get_authorization_url(request_token, CALLBACK_URL))
+            self.redirect(oauthapp.get_authorization_url(request_token))
 
           else:
 

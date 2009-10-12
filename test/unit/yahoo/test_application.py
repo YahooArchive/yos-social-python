@@ -24,7 +24,7 @@ class OAuthApplicationTest(unittest.TestCase):
     self.oauthapp.token = self.oauthapp.refresh_access_token(self.oauthapp.token)
 
   def test_get_request_token(self):
-    request_token = self.oauthapp.get_request_token()
+    request_token = self.oauthapp.get_request_token(CALLBACK_URL)
     self.assertEquals('3600', request_token.expires_in)
     self.assertEquals('https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=%s' % request_token.key, request_token.request_auth_url)
 
@@ -34,8 +34,8 @@ class OAuthApplicationTest(unittest.TestCase):
     self.assertEquals('ECPZF7D765KTAXPDKWS7GE7CUU', self.oauthapp.token.yahoo_guid)
 
   def test_get_authorization_url(self):
-    request_token = self.oauthapp.get_request_token()
-    self.assertEquals('https://api.login.yahoo.com/oauth/v2/request_auth?oauth_token=%s' % request_token.key, self.oauthapp.get_authorization_url(request_token, None))
+    request_token = self.oauthapp.get_request_token(CALLBACK_URL)
+    self.assertEquals(0, self.oauthapp.get_authorization_url(request_token).find('https://api.login.yahoo.com/oauth/v2/request_auth'))
 
   def test_get_profile(self):
     profile = self.oauthapp.getProfile()
@@ -56,12 +56,12 @@ class OAuthApplicationTest(unittest.TestCase):
     self.assertEquals(10, contacts['count'])
 
   def test_get_contact(self):
-	contact = self.oauthapp.getContact(1)['contact']
-	self.assertEquals(1, contact['id'])
-	
+	  contact = self.oauthapp.getContact(1)['contact']
+	  self.assertEquals(1, contact['id'])
+
   def test_get_contact_sync(self):
-	contactsync = self.oauthapp.getContactSync(0)['contactsync']
-	self.assertEquals(0, contactsync['clientrev'])
+	  contactsync = self.oauthapp.getContactSync(0)['contactsync']
+	  self.assertEquals(0, contactsync['clientrev'])
 
   def test_get_updates(self):
     updates = self.oauthapp.getUpdates()['updates']

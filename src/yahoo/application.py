@@ -46,7 +46,7 @@ class OAuthApplicationException(Exception):
 
 class OAuthApplication(object):
 
-  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None, options = { }):
+  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None, options = { 'lang': 'en' }):
 
     self.client = oauth.Client()
 
@@ -62,15 +62,14 @@ class OAuthApplication(object):
     self.signature_method_hmac_sha1 = oauthlib.oauth.OAuthSignatureMethod_HMAC_SHA1()
 
   # oauth standard apis
-  def get_request_token(self):
-    # self.options['lang']
-    parameters = { 'xoauth_lang_pref': 'en' }
+  def get_request_token(self, callback = 'oob'):
+    parameters = { 'xoauth_lang_pref': self.options['lang'], 'oauth_callback': callback }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, http_method='GET', http_url=self.client.request_token_url, parameters=parameters)
     request.sign_request(self.signature_method_plaintext, self.consumer, None)
     return self.client.fetch_request_token(request)
 
-  def get_authorization_url(self, request_token, callback):
-    return oauthlib.oauth.OAuthRequest.from_token_and_callback(token=request_token, callback=callback, http_method='GET', http_url=self.client.authorization_url).to_url()
+  def get_authorization_url(self, request_token):
+    return oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=request_token, http_method='GET', http_url=self.client.authorization_url).to_url()
 
   def get_access_token(self, request_token, verifier=None):
     if verifier == None:
@@ -126,7 +125,7 @@ class OAuthApplication(object):
       return False
 
   def getContacts(self, offset=0, limit=10000):
-    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
     parameters = { 'format': 'json', 'view': 'tinyusercard', 'start': offset, 'count': limit }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
@@ -136,8 +135,7 @@ class OAuthApplication(object):
       return False
 
   def getContact(self, contact_id):
-    guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/contact/%s' % (guid, contact_id)
+    url = SOCIAL_API_URL + '/user/%s/contact/%s' % (self.token.yahoo_guid, contact_id)
     parameters = { 'format': 'json' }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
@@ -147,35 +145,30 @@ class OAuthApplication(object):
       return False
 
   def addContact(self, contact):
-    guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
     parameters = { 'format': 'json' }
-    data = {'contact': contact}
-    body = simplejson.dumps(data);
+    data = { 'contact': contact }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='POST', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
     try:
-      return simplejson.loads(self.client.access_resource(request, body))
+      return simplejson.loads(self.client.access_resource(request, simplejson.dumps(data)))
     except:
       return False
 
   def syncContacts(self, contact_sync):
-    guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
     parameters = { 'format': 'json' }
-    data = {'contactsync': contact_sync}
-    body = simplejson.dumps(data);
+    data = { 'contactsync': contact_sync }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
     try:
-      return simplejson.loads(self.client.access_resource(request, body))
+      return simplejson.loads(self.client.access_resource(request, simplejson.dumps(data)))
     except:
       return False
 
-  def getContactSync(self, rev = 0):
-    guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/contacts' % guid
-    parameters = { 'format': 'json', 'view': 'sync', 'rev': rev }
+  def getContactSync(self, revision = 0):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
+    parameters = { 'format': 'json', 'view': 'sync', 'rev': revision }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
     try:
@@ -195,9 +188,10 @@ class OAuthApplication(object):
     except:
       return False
 
-  def insertUpdate(self, descr, title, link, guid=None):
+  def insertUpdate(self, title, description, link, guid=None):
     if guid == None:
       guid = self.token.yahoo_guid
+
     source = "APP.%s" % self.application_id
     suid = 'ugc%s' % random.randrange(0, 101)
     parameters = { 'format': 'json' }
@@ -217,7 +211,7 @@ class OAuthApplication(object):
                 "collectionID": "%s"
             }
         ]
-    }''' % (descr, suid, link, source, int(time.time()), title, guid)
+    }''' % (description, suid, link, source, int(time.time()), title, guid)
 
     url = "%s/user/%s/updates/%s/%s" % (SOCIAL_API_URL, guid, source, suid)
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)

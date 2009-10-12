@@ -104,10 +104,10 @@ Examples
     oauthapp      = yahoo.application.OAuthApplication(CONSUMER_KEY, CONSUMER_SECRET, APPLICATION_ID, CALLBACK_URL)
 
     # Fetch request token
-    request_token = oauthapp.get_request_token()
+    request_token = oauthapp.get_request_token(CALLBACK_URL)
 
     # Redirect user to authorization url
-    redirect_url  = oauthapp.get_authorization_url(request_token, CALLBACK_URL)
+    redirect_url  = oauthapp.get_authorization_url(request_token, verifier)
 
     # Exchange request token for authorized access token
     access_token  = oauthapp.get_access_token(request_token)
@@ -118,6 +118,16 @@ Examples
     profile = oauthapp.getProfile()
 
     print profile
+
+
+## Signing with SimpleAuth (OpenID + OAuth):
+
+    See the bundled sample code in examples/simpleauth/simpleauth.py.
+
+
+## Fetching people and activities with OpenSocial:
+
+    See the bundled sample code in examples/opensocial/profile.py.
 
 
 Tests
