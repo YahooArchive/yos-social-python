@@ -33,7 +33,7 @@ Hosted on GitHub: http://github.com/yahoo/yos-social-python/tree/master
 __author__   = 'Dustin Whittle <dustin@yahoo-inc.com>'
 __version__  = '0.1'
 
-import httplib, urllib, urlparse, cgi, oauthlib.oauth, simplejson
+import time, random, oauthlib.oauth, simplejson
 
 from . import oauth
 from . import yql
@@ -46,7 +46,7 @@ class OAuthApplicationException(Exception):
 
 class OAuthApplication(object):
 
-  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None):
+  def __init__(self, consumer_key, consumer_secret, application_id, callback_url = None, token = None, options = { 'lang': 'en' }):
 
     self.client = oauth.Client()
 
@@ -55,20 +55,21 @@ class OAuthApplication(object):
     self.application_id      = application_id
     self.callback_url        = callback_url
     self.token               = token
+    self.options             = options
 
-    self.consumer = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
+    self.consumer                   = oauthlib.oauth.OAuthConsumer(self.consumer_key, self.consumer_secret)
     self.signature_method_plaintext = oauthlib.oauth.OAuthSignatureMethod_PLAINTEXT()
     self.signature_method_hmac_sha1 = oauthlib.oauth.OAuthSignatureMethod_HMAC_SHA1()
 
   # oauth standard apis
-  def get_request_token(self):
-    parameters = { 'xoauth_lang_pref': 'en' }
+  def get_request_token(self, callback = 'oob'):
+    parameters = { 'xoauth_lang_pref': self.options['lang'], 'oauth_callback': callback }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, http_method='GET', http_url=self.client.request_token_url, parameters=parameters)
     request.sign_request(self.signature_method_plaintext, self.consumer, None)
     return self.client.fetch_request_token(request)
 
-  def get_authorization_url(self, request_token, callback):
-    return oauthlib.oauth.OAuthRequest.from_token_and_callback(token=request_token, callback=callback, http_method='GET', http_url=self.client.authorization_url).to_url()
+  def get_authorization_url(self, request_token):
+    return oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=request_token, http_method='GET', http_url=self.client.authorization_url).to_url()
 
   def get_access_token(self, request_token, verifier=None):
     if verifier == None:
@@ -76,7 +77,7 @@ class OAuthApplication(object):
     else:
       parameters = { 'oauth_verifier': verifier }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=request_token, http_method='GET', http_url=self.client.access_token_url, parameters=parameters)
-    request.sign_request(self.signature_method_hmac_sha1, self.consumer, request_token)
+    request.sign_request(self.signature_method_plaintext, self.consumer, request_token)
     self.token = self.client.fetch_access_token(request)
     return self.token
 
@@ -123,11 +124,51 @@ class OAuthApplication(object):
     except:
       return False
 
-  def getContacts(self, guid=None, offset=0, limit=10000):
-    if guid == None:
-      guid = self.token.yahoo_guid
-    url = SOCIAL_API_URL + '/user/%s/connections' % guid
+  def getContacts(self, offset=0, limit=10000):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
     parameters = { 'format': 'json', 'view': 'tinyusercard', 'start': offset, 'count': limit }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request))
+    except:
+      return False
+
+  def getContact(self, contact_id):
+    url = SOCIAL_API_URL + '/user/%s/contact/%s' % (self.token.yahoo_guid, contact_id)
+    parameters = { 'format': 'json' }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request))
+    except:
+      return False
+
+  def addContact(self, contact):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
+    parameters = { 'format': 'json' }
+    data = { 'contact': contact }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='POST', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request, simplejson.dumps(data)))
+    except:
+      return False
+
+  def syncContacts(self, contact_sync):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
+    parameters = { 'format': 'json' }
+    data = { 'contactsync': contact_sync }
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+    try:
+      return simplejson.loads(self.client.access_resource(request, simplejson.dumps(data)))
+    except:
+      return False
+
+  def getContactSync(self, revision = 0):
+    url = SOCIAL_API_URL + '/user/%s/contacts' % self.token.yahoo_guid
+    parameters = { 'format': 'json', 'view': 'sync', 'rev': revision }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=url, parameters=parameters)
     request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
     try:
@@ -147,6 +188,46 @@ class OAuthApplication(object):
     except:
       return False
 
+  def insertUpdate(self, title, description, link, guid=None):
+    if guid == None:
+      guid = self.token.yahoo_guid
+
+    source = "APP.%s" % self.application_id
+    suid = 'ugc%s' % random.randrange(0, 101)
+    parameters = { 'format': 'json' }
+    body = '''
+    { "updates":
+        [
+            {
+                "class": "app",
+                "collectionType": "guid",
+                "description": "%s",
+                "suid": "%s",
+                "link": "%s",
+                "source": "%s",
+                "pubDate": "%s",
+                "title": "%s",
+                "type": "appActivity",
+                "collectionID": "%s"
+            }
+        ]
+    }''' % (description, suid, link, source, int(time.time()), title, guid)
+
+    url = "%s/user/%s/updates/%s/%s" % (SOCIAL_API_URL, guid, source, suid)
+    request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='PUT', http_url=url, parameters=parameters)
+    request.sign_request(self.signature_method_hmac_sha1, self.consumer, self.token)
+
+    try:
+      return simplejson.loads(self.client.access_resource(request, body))
+    except:
+      return False
+
+  def getSocialGraph(self, offset=0, limit=10000):
+    return self.yql('select * from social.profile (%s, %s) where guid in (select guid from social.connections (%s, %s) where owner_guid=me)' % (offset, limit, offset, limit))['query']['results']['profile']
+
+  def getGeoPlaces(self, location):
+    return self.yql('select * from geo.places where text="' + location + '"')['query']['results']
+
   def yql(self, query):
     parameters = { 'q': query, 'format': 'json', 'env': yql.DATATABLES_URL }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=self.token, http_method='GET', http_url=yql.OAUTH_API_URL, parameters=parameters)
@@ -155,4 +236,3 @@ class OAuthApplication(object):
       return simplejson.loads(self.client.access_resource(request))
     except:
       return False
-
