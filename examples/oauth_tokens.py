@@ -89,7 +89,7 @@ def main():
     while not cb:
       cb = raw_input('Please enter callback url: ')
   except getopt.error, msg:
-    print ('python basic.py')
+    print ('python oauth_tokens.py')
     sys.exit(2)
 
   # make public request for data oauth requests for profiles
@@ -103,20 +103,20 @@ def main():
   except:
     access_token=None
   if access_token:
-    print 'You have an access token: %s' % str(access_token.to_string())
+    print 'You have an access token: %s' % str(access_token.to_string().strip())
   else:
     # get request token
     print '* Obtain a request token ...'
-    request_token = oauthapp.get_request_token()
+    request_token = oauthapp.get_request_token(CALLBACK_URL)
 
     # authorize the request token
     print '\n* Authorize the request token ...'
-    print '\nAuthorization URL:\n%s' % oauthapp.get_authorization_url(request_token, CALLBACK_URL)
+    print '\nAuthorization URL:\n%s' % oauthapp.get_authorization_url(request_token)
     verifier = raw_input('Please authorize the url above ^^^')
 
     # now the token we get back is an access token
     print '\n* Obtain an access token ...'
-    access_token = oauthapp.get_access_token(request_token)
+    access_token = oauthapp.get_access_token(request_token, verifier.strip())
     print '\nkey: %s' % str(access_token.key)
     print 'secret: %s' % str(access_token.secret)
     print 'yahoo guid: %s' % str(access_token.yahoo_guid)
@@ -130,7 +130,6 @@ def main():
   oauthapp.token = access_token
 
   pprint.PrettyPrinter(indent=2).pprint(oauthapp.getProfile())
-
 
 
 if __name__ == '__main__':
