@@ -139,7 +139,7 @@ class AccessToken(oauthlib.oauth.OAuthToken):
 
 class Client(oauthlib.oauth.OAuthClient):
 
-  def __init__(self, server='https://api.login.yahoo.com/.', port=httplib.HTTPS_PORT, request_token_url=REQUEST_TOKEN_API_URL, access_token_url=ACCESS_TOKEN_API_URL, authorization_url=AUTHORIZATION_API_URL):
+  def __init__(self, server='https://api.login.yahoo.com/', port=httplib.HTTPS_PORT, request_token_url=REQUEST_TOKEN_API_URL, access_token_url=ACCESS_TOKEN_API_URL, authorization_url=AUTHORIZATION_API_URL):
     urlData = urlparse.urlparse(server)
 
     self.server            = urlData.netloc
@@ -153,20 +153,19 @@ class Client(oauthlib.oauth.OAuthClient):
     else:
       self.connection = httplib.HTTPConnection("%s:%d" % (urlData.netloc, self.port))
 
+#    self.connection.set_debuglevel(3)
+
   def fetch_request_token(self, oauth_request):
-    self.connection.request(oauth_request.http_method, self.request_token_url, headers=oauth_request.to_header())
-    response = self.connection.getresponse()
-    return RequestToken.from_string(response.read())
+    self.connection.request(oauth_request.http_method, self.request_token_url, headers=oauth_request.to_header('yahooapis.com'))
+    return RequestToken.from_string(self.connection.getresponse().read().strip())
 
   def fetch_access_token(self, oauth_request):
-    self.connection.request(oauth_request.http_method, self.access_token_url, headers=oauth_request.to_header())
-    response = self.connection.getresponse()
-    return AccessToken.from_string(response.read())
+    self.connection.request(oauth_request.http_method, self.access_token_url, headers=oauth_request.to_header('yahooapis.com'))
+    return AccessToken.from_string(self.connection.getresponse().read().strip())
 
   def authorize_token(self, oauth_request):
-    self.connection.request(oauth_request.http_method, self.authorization_url, headers=oauth_request.to_header())
-    response = self.connection.getresponse()
-    return response.read()
+    self.connection.request(oauth_request.http_method, self.authorization_url, headers=oauth_request.to_header('yahooapis.com'))
+    return self.connection.getresponse().read().strip()
 
   def access_resource(self, oauth_request, body = None):
     urlData = urlparse.urlparse(oauth_request.get_normalized_http_url())
@@ -183,6 +182,4 @@ class Client(oauthlib.oauth.OAuthClient):
     else:
       connection.request(oauth_request.http_method, oauth_request.to_url())
 
-    response = connection.getresponse()
-
-    return response.read()
+    return connection.getresponse().read().strip()

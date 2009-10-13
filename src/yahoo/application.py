@@ -77,7 +77,7 @@ class OAuthApplication(object):
     else:
       parameters = { 'oauth_verifier': verifier }
     request = oauthlib.oauth.OAuthRequest.from_consumer_and_token(self.consumer, token=request_token, http_method='GET', http_url=self.client.access_token_url, parameters=parameters)
-    request.sign_request(self.signature_method_hmac_sha1, self.consumer, request_token)
+    request.sign_request(self.signature_method_plaintext, self.consumer, request_token)
     self.token = self.client.fetch_access_token(request)
     return self.token
 
