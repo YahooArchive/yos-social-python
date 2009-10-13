@@ -6,7 +6,7 @@ from distutils.core import setup
 
 setup(
     name='yos_social_sdk',
-    version='0.0.1',
+    version='0.0.2',
     description='Python client library for Yahoo! Social + Data REST APIs',
     author='Dustin Whittle',
     author_email='dustin@yahoo-inc.com',
