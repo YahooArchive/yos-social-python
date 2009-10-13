@@ -38,7 +38,7 @@ import httplib, urllib, simplejson
 # Yahoo! YQL API
 PUBLIC_API_URL  = 'http://query.yahooapis.com/v1/public/yql'
 OAUTH_API_URL   = 'http://query.yahooapis.com/v1/yql'
-DATATABLES_URL  = 'http://datatables.org/alltables.env'
+DATATABLES_URL  = 'store://datatables.org/alltableswithkeys'
 
 class YQLQuery(object):
 
