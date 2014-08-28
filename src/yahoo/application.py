@@ -39,7 +39,7 @@ from . import oauth
 from . import yql
 
 # Yahoo! Social API
-SOCIAL_API_URL = 'http://social.yahooapis.com/v1'
+SOCIAL_API_URL = 'https://social.yahooapis.com/v1'
 
 class OAuthApplicationException(Exception):
   pass
